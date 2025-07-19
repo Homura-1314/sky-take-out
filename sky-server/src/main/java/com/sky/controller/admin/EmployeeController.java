@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -88,6 +89,20 @@ public class EmployeeController {
     public Result statusOrstop(@PathVariable Integer status, Long id) {
         log.info("启动禁用员工账号：{}，{}", status, id);
         employeeService.statusOrstop(status, id);
+        return Result.success();
+    }
+    
+    @GetMapping("/{id}")
+    public Result getInfo(@PathVariable Long id) {
+        log.info("根据id查询员工：{}", id);
+        Employee employee = employeeService.getinfo(id);
+        return Result.success(employee);
+    }
+
+    @PutMapping
+    public Result update(@RequestBody EmployeeDTO employeeDTO) {
+        log.info("修改员工", employeeDTO);
+        employeeService.updata(employeeDTO);
         return Result.success();
     }
 

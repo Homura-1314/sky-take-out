@@ -21,4 +21,8 @@ public interface EmployeeService {
 
     void statusOrstop(Integer status, Long id);
 
+    Employee getinfo(Long id);
+
+    void updata(EmployeeDTO employee);
+
 }

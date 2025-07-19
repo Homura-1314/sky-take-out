@@ -36,4 +36,10 @@ public interface EmployeeMapper {
 	List<Employee> page(EmployeePageQueryDTO employeePageQueryDTO);
 
     void updata(Employee employee);
+
+    @Select("""
+            select id, name, username, password, phone, sex, id_number, status, create_time, update_time, create_user, update_user from employee
+             where id = #{id}
+            """)
+    Employee getinfo(Long id);
 }

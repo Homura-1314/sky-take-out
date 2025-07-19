@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Data
 @Builder
@@ -26,6 +27,7 @@ public class Employee implements Serializable {
 
     private String name;
 
+    @JsonIgnore
     private String password;
 
     private String phone;
