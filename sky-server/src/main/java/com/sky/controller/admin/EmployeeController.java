@@ -7,6 +7,7 @@ import javax.print.attribute.standard.PageRanges;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -81,6 +82,13 @@ public class EmployeeController {
         log.info("分页查询员工：{}", employeePageQueryDTO);
         PageResult<Employee> pageResult = employeeService.page(employeePageQueryDTO);
         return Result.success(pageResult);
+    }
+
+    @PostMapping("/status/{status}")
+    public Result statusOrstop(@PathVariable Integer status, Long id) {
+        log.info("启动禁用员工账号：{}，{}", status, id);
+        employeeService.statusOrstop(status, id);
+        return Result.success();
     }
 
     /**
