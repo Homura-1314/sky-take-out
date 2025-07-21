@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+import org.apache.poi.ss.formula.functions.T;
 
 import com.github.pagehelper.Page;
 import com.sky.annotation.AutoFill;
@@ -29,9 +30,12 @@ public interface DishMapper {
     Page<DishVO> pageQuery(DishPageQueryDTO dishPageQueryDTO);
 
     @Select("select * from dish where id = #{id}")
-	Dish getByid(Integer item);
+	Dish getByid(Long id);
 
     void delete(List<Integer> ids);
+
+    @Select("select * from dish where id = #{id}")
+    Dish getByidList();
 
     
 

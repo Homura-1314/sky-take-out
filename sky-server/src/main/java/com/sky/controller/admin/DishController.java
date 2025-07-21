@@ -18,6 +18,7 @@ import com.sky.dto.DishPageQueryDTO;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.DishService;
+import com.sky.vo.DishVO;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,6 +42,12 @@ public class DishController {
         return Result.success();
     }
 
+    /**
+     * 
+     * @param dishPageQueryDTO
+     * @return pageResult
+     */
+
     @GetMapping("/page")
     public Result<PageResult> page(DishPageQueryDTO dishPageQueryDTO) {
         log.info("菜品分页查询：{}", dishPageQueryDTO);
@@ -48,11 +55,30 @@ public class DishController {
         return Result.success(pageResult);
     }
 
+    /**
+     * 
+     * @param ids
+     * @return
+     */
+
     @DeleteMapping
     public Result delete(@RequestParam List<Integer> ids) {
         log.info("菜品批量删除：{}", ids);
         dishService.delete(ids);
         return Result.success();
+    }
+
+    /**
+     * 
+     * @param id
+     * @return
+     */
+
+    @GetMapping("/{id}")
+    public Result<DishVO> getByid(@PathVariable Long id) {
+        log.info("根据id查询菜品：{}", id);
+        DishVO dishVO = dishService.getByid(id);
+        return Result.success(dishVO);
     }
 
 }
