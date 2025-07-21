@@ -41,7 +41,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler
     public Result handleDataIntegrityViolation(DataIntegrityViolationException e) {
         log.error("程序出错啦~", e);
-        return Result.error("对不起，当前部门下有员工，不能直接删除！");
+        return Result.error("对不起，当前菜品有被关联的套餐，不能直接删除！");
     }
 
 }
