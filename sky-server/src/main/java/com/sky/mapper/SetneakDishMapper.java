@@ -8,6 +8,6 @@ import org.apache.ibatis.annotations.Mapper;
 public interface SetneakDishMapper {
 
     
-    List<Integer> getSetmealIds(List<Integer> ids);
+    List<Long> getSetmealIds(List<Long> ids);
     
 }

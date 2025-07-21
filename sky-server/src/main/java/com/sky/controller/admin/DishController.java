@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -62,7 +63,7 @@ public class DishController {
      */
 
     @DeleteMapping
-    public Result delete(@RequestParam List<Integer> ids) {
+    public Result delete(@RequestParam List<Long> ids) {
         log.info("菜品批量删除：{}", ids);
         dishService.delete(ids);
         return Result.success();
@@ -79,6 +80,19 @@ public class DishController {
         log.info("根据id查询菜品：{}", id);
         DishVO dishVO = dishService.getByid(id);
         return Result.success(dishVO);
+    }
+
+    /**
+     * 
+     * @param dishDTO
+     * @return
+     */
+
+    @PutMapping
+    public Result update(@RequestBody DishDTO dishDTO) {
+        log.info("修改菜品信息：{}", dishDTO);
+        dishService.updata(dishDTO);
+        return Result.success();
     }
 
 }

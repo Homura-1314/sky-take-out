@@ -12,7 +12,7 @@ public interface DishFlavorMapper {
 
     void insertBatch(List<DishFlavor> flavors);
 
-    void delete(List<Integer> ids);
+    void delete(List<Long> ids);
 
     @Select("select * from dish_flavor where dish_id = #{id}")
 	List<DishFlavor> getByDishId(Long id);

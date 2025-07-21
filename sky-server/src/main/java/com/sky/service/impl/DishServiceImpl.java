@@ -1,5 +1,6 @@
 package com.sky.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.BeanUtils;
@@ -71,7 +72,7 @@ public class DishServiceImpl implements DishService{
 
     @Override
     @Transactional
-    public void delete(List<Integer> ids) {
+    public void delete(List<Long> ids) {
         // 判断当前菜品是否能删除
         ids.forEach(item ->{
             Dish dish = dishMapper.getByidList();
@@ -79,7 +80,7 @@ public class DishServiceImpl implements DishService{
                 throw new DeletionNotAllowedException(MessageConstant.DISH_ON_SALE);
             }
         });
-        List<Integer> stmerids = setneakDishMapper.getSetmealIds(ids);
+        List<Long> stmerids = setneakDishMapper.getSetmealIds(ids);
         if (stmerids != null && stmerids.size() > 0) {
             throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
         }
@@ -95,6 +96,23 @@ public class DishServiceImpl implements DishService{
         BeanUtils.copyProperties(dish, dishVO);
         dishVO.setFlavors(dishFlavors);
         return dishVO;
+    }
+
+    @Override
+    public void updata(DishDTO dishDTO) {
+        Dish dish = new Dish();
+        BeanUtils.copyProperties(dishDTO, dish);
+        dishMapper.update(dish);
+        List<Long> ids = new ArrayList<>();
+        ids.add(dishDTO.getId());
+        dishFlavorMapper.delete(ids);
+        List<DishFlavor> dishFlavors = dishDTO.getFlavors();
+        if (dishFlavors != null && dishFlavors.size() > 0) {
+            dishFlavors.forEach(item -> {
+                item.setDishId(dishDTO.getId());
+            });
+            dishFlavorMapper.insertBatch(dishFlavors);
+        }
     }
 
 }
