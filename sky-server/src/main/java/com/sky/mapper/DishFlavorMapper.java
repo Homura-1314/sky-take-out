@@ -8,7 +8,9 @@ import com.sky.entity.DishFlavor;
 
 @Mapper
 public interface DishFlavorMapper {
-    
+
     void insertBatch(List<DishFlavor> flavors);
+
+    void delete(List<Integer> ids);
 
 }

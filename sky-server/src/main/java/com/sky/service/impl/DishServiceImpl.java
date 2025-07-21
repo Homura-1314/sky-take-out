@@ -9,12 +9,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.sky.constant.MessageConstant;
+import com.sky.constant.StatusConstant;
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
+import com.sky.exception.DeletionNotAllowedException;
 import com.sky.mapper.DishFlavorMapper;
 import com.sky.mapper.DishMapper;
+import com.sky.mapper.SetneakDishMapper;
 import com.sky.result.PageResult;
 import com.sky.service.DishService;
 import com.sky.vo.DishVO;
@@ -29,6 +33,8 @@ public class DishServiceImpl implements DishService{
     private DishMapper dishMapper;
     @Autowired
     private DishFlavorMapper dishFlavorMapper;
+    @Autowired
+    private SetneakDishMapper setneakDishMapper;
 
     /**
      * 新增菜品和对应的口味
@@ -61,6 +67,24 @@ public class DishServiceImpl implements DishService{
         PageHelper.startPage(dishPageQueryDTO.getPage(), dishPageQueryDTO.getPageSize());
         Page<DishVO> page = dishMapper.pageQuery(dishPageQueryDTO);
         return new PageResult<>(page.getTotal(), page.getResult());
+    }
+
+    @Override
+    @Transactional
+    public void delete(List<Integer> ids) {
+        // 判断当前菜品是否能删除
+        ids.forEach(item ->{
+            Dish dish = dishMapper.getByid(item);
+            if (dish.getStatus().equals(StatusConstant.ENABLE)){
+                throw new DeletionNotAllowedException(MessageConstant.DISH_ON_SALE);
+            }
+        });
+        List<Integer> stmerids = setneakDishMapper.getSetmealIds(ids);
+        if (stmerids != null && stmerids.size() > 0) {
+            throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
+        }
+        dishMapper.delete(ids);
+        dishFlavorMapper.delete(ids);
     }
 
 }
