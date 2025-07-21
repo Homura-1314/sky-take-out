@@ -6,3 +6,8 @@ sky:
     database: sky_take_out
     username: root
     password: 200510qq.
+  alioss:
+    endpoint: oss-cn-beijing.aliyuncs.com
+    access-key-id: LTAI5tPiLaP8sMxTqe9iVgRP
+    access-key-secret: 97BN0J0lgkWUWS9JO6tGrk12CNqaEf
+    bucket-name: hikaritext

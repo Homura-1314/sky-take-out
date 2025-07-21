@@ -71,12 +71,24 @@ public class EmployeeController {
         return Result.success(employeeLoginVO);
     }
 
+    /**
+     * 
+     * @param employeeDTO
+     * @return
+     */
+
     @PostMapping
     public Result query(@RequestBody EmployeeDTO employeeDTO) {
         log.info("新增员工：{}", employeeDTO);
         employeeService.save(employeeDTO);
         return Result.success();
     }
+
+    /**
+     * 
+     * @param employeePageQueryDTO
+     * @return
+     */
 
     @GetMapping("/page")
     public Result<PageResult> page(EmployeePageQueryDTO employeePageQueryDTO) {
@@ -85,6 +97,13 @@ public class EmployeeController {
         return Result.success(pageResult);
     }
 
+    /***
+     * 
+     * @param status
+     * @param id
+     * @return
+     */
+
     @PostMapping("/status/{status}")
     public Result statusOrstop(@PathVariable Integer status, Long id) {
         log.info("启动禁用员工账号：{}，{}", status, id);
@@ -92,12 +111,24 @@ public class EmployeeController {
         return Result.success();
     }
     
+    /***
+     * 
+     * @param id
+     * @return
+     */
+
     @GetMapping("/{id}")
     public Result getInfo(@PathVariable Long id) {
         log.info("根据id查询员工：{}", id);
         Employee employee = employeeService.getinfo(id);
         return Result.success(employee);
     }
+
+    /***
+     * 
+     * @param employeeDTO
+     * @return
+     */
 
     @PutMapping
     public Result update(@RequestBody EmployeeDTO employeeDTO) {
