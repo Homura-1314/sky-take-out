@@ -11,6 +11,7 @@ import com.sky.vo.SetmealVO;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.data.repository.query.Param;
@@ -32,4 +33,8 @@ public interface SetmealMapper {
     void insert(Setmeal setmeal);
 
     void insertDish(@Param("setmealDishs") List<SetmealDish> setmealDishs);
+
+    void deleteSetmealDishId(List<Long> ids);
+
+    void deleteSetmeaId(List<Long> ids);
 }

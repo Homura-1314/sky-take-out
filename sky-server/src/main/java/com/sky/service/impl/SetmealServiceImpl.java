@@ -48,5 +48,11 @@ public class SetmealServiceImpl implements SetmealService{
         setmealMapper.insertDish(setmealDishs);
     }
 
-   
+    @Override
+    @Transactional
+    public void delete(List<Long> ids) {
+        setmealMapper.deleteSetmealDishId(ids);
+        setmealMapper.deleteSetmeaId(ids);
+    }
+
 }
