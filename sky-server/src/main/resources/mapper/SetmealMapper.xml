@@ -55,4 +55,18 @@
                         #{id}
                 </foreach>
     </delete>
+
+    <!-- getByid --> 
+
+    <select id="getByid" resultType="com.sky.vo.SetmealVO">
+        select s.*, c.name as categoryName
+        from setmeal s left join category c on s.category_id = c.id
+        where s.id = #{id}
+    </select>
+
+    <!-- getBySetmealId --> 
+
+    <select id="getBySetmealId" resultType="com.sky.entity.SetmealDish">
+        select * from setmeal_dish where setmeal_id = #{setmealId}
+    </select>
 </mapper>

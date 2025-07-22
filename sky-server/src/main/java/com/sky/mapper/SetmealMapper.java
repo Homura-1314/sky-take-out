@@ -37,4 +37,8 @@ public interface SetmealMapper {
     void deleteSetmealDishId(List<Long> ids);
 
     void deleteSetmeaId(List<Long> ids);
+
+    SetmealVO getByid(Long id);
+
+    List<SetmealDish> getBySetmealId(Long id);
 }

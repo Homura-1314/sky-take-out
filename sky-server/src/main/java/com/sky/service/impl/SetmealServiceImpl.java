@@ -55,4 +55,16 @@ public class SetmealServiceImpl implements SetmealService{
         setmealMapper.deleteSetmeaId(ids);
     }
 
+    @Override
+    public SetmealVO getByid(Long id) {
+       // 1. 查询套餐基本信息
+        SetmealVO setmealVO = setmealMapper.getByid(id);
+        if (setmealVO != null) {
+            // 2. 查询套餐包含的菜品
+            List<SetmealDish> setmealDishes = setmealMapper.getBySetmealId(id);
+            // 3. 将菜品列表设置到 VO 中
+            setmealVO.setSetmealDishes(setmealDishes);
+        }
+        return setmealVO;
+    }
 }
