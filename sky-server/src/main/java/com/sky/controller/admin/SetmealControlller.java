@@ -28,9 +28,9 @@ public class SetmealControlller {
      */
 
     @GetMapping("/page")
-    public Result<PageResult> page(@RequestBody SetmealPageQueryDTO setmealPageQueryDTO) {
+    public Result<PageResult> page(SetmealPageQueryDTO setmealPageQueryDTO) {
         log.info("分页查询：{}", setmealPageQueryDTO);
-        PageResult pageResult = setmealService.page(setmealService);
+        PageResult pageResult = setmealService.page(setmealPageQueryDTO);
         return Result.success(pageResult);
     }
 

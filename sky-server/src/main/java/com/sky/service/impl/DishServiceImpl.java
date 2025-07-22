@@ -50,7 +50,7 @@ public class DishServiceImpl implements DishService{
         dishMapper.insert(dish);
         Long dishid = dish.getId();
         List<DishFlavor> flavors = dishDTO.getFlavors();
-        if (flavors != null && flavors.size() > 0) {
+        if (flavors != null && !flavors.isEmpty()) {
             flavors.forEach(item -> {
                 item.setDishId(dishid);
             });
@@ -81,7 +81,7 @@ public class DishServiceImpl implements DishService{
             }
         });
         List<Long> stmerids = setneakDishMapper.getSetmealIds(ids);
-        if (stmerids != null && stmerids.size() > 0) {
+        if (stmerids != null && !stmerids.isEmpty()) {
             throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
         }
         dishMapper.delete(ids);
@@ -107,7 +107,7 @@ public class DishServiceImpl implements DishService{
         ids.add(dishDTO.getId());
         dishFlavorMapper.delete(ids);
         List<DishFlavor> dishFlavors = dishDTO.getFlavors();
-        if (dishFlavors != null && dishFlavors.size() > 0) {
+        if (dishFlavors != null && !dishFlavors.isEmpty()) {
             dishFlavors.forEach(item -> {
                 item.setDishId(dishDTO.getId());
             });
