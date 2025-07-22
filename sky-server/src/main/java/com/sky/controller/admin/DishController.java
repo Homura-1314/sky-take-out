@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
+import com.sky.entity.Dish;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.DishService;
@@ -93,6 +94,13 @@ public class DishController {
         log.info("修改菜品信息：{}", dishDTO);
         dishService.updata(dishDTO);
         return Result.success();
+    }
+
+    @GetMapping("/list")
+    public Result<List<Dish>> listByid(Integer categoryId) {
+        log.info("根据分类id查询菜品：{}", categoryId);
+        List<Dish> dish = dishService.listByid(categoryId);
+        return Result.success(dish);
     }
 
 }

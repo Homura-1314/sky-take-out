@@ -56,4 +56,14 @@
                         id = #{id}
                 </where>
         </update>
+
+        <!-- listByid --> 
+
+        <select id="listByid" resultType="com.sky.entity.Dish">
+                select d.id, d.name, category_id, price, image, description, d.status, d.create_time, d.update_time, d.create_user, d.update_user from
+                dish d left join category c on d.category_id = c.id
+                <where>
+                        <if test="categoryId !=null">d.category_id = #{categoryId}</if>
+                </where>
+        </select>
 </mapper>
