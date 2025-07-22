@@ -1,6 +1,7 @@
 package com.sky.service.impl;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.BeanUtils;
@@ -66,5 +67,23 @@ public class SetmealServiceImpl implements SetmealService{
             setmealVO.setSetmealDishes(setmealDishes);
         }
         return setmealVO;
+    }
+
+    @Override
+    @Transactional
+    public void update(SetmealVO setmealVO) {
+        // TODO Auto-generated method stub
+        setmealVO.setUpdateTime(LocalDateTime.now());
+        setmealMapper.update(setmealVO);
+        List<Long> ids = new ArrayList<>();
+        ids.add(setmealVO.getId());
+        setmealMapper.deleteSetmealDishId(ids);
+        List<SetmealDish> setmealDishs = setmealVO.getSetmealDishes();
+        if (setmealDishs != null && !setmealDishs.isEmpty()) {
+            setmealDishs.forEach(item -> {
+                item.setSetmealId(setmealVO.getId());
+            });
+        }
+        setmealMapper.insertDish(setmealDishs);
     }
 }

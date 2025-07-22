@@ -17,4 +17,6 @@ public interface SetmealService {
 
     SetmealVO getByid(Long id);
 
+    void update(SetmealVO setmealVO);
+
 }

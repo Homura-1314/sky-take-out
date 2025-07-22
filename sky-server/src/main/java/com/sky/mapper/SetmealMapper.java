@@ -41,4 +41,11 @@ public interface SetmealMapper {
     SetmealVO getByid(Long id);
 
     List<SetmealDish> getBySetmealId(Long id);
+
+    @Delete("delete from setmeal where id = #{id}")
+    void deleteSetmea(SetmealVO setmealVO);
+    @Delete("delete from setmeal_dish where setmeal_id")
+    void deleteSetmeaDIsh(SetmealDish setmealDish);
+    
+    void update(SetmealVO setmealVO);
 }
