@@ -14,6 +14,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import org.springframework.data.repository.query.Param;
 
 @Mapper
@@ -48,4 +49,10 @@ public interface SetmealMapper {
     void deleteSetmeaDIsh(SetmealDish setmealDish);
     
     void update(SetmealVO setmealVO);
+
+    @Update("update setmeal set status = #{id}")
+    void Status(Integer id);
+
+    @AutoFill(value = OperationType.UPDATE)
+    void updateStatus(Setmeal setmeal);
 }

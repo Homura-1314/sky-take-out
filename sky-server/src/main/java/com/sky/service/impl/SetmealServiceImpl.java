@@ -72,7 +72,6 @@ public class SetmealServiceImpl implements SetmealService{
     @Override
     @Transactional
     public void update(SetmealVO setmealVO) {
-        // TODO Auto-generated method stub
         setmealVO.setUpdateTime(LocalDateTime.now());
         setmealMapper.update(setmealVO);
         List<Long> ids = new ArrayList<>();
@@ -85,5 +84,14 @@ public class SetmealServiceImpl implements SetmealService{
             });
         }
         setmealMapper.insertDish(setmealDishs);
+    }
+
+    @Override
+    public void Status(Integer status, Long id) {
+        // TODO Auto-generated method stub
+        Setmeal setmeal = new Setmeal();
+        setmeal.setId(id);
+        setmeal.setStatus(status);
+        setmealMapper.updateStatus(setmeal);
     }
 }

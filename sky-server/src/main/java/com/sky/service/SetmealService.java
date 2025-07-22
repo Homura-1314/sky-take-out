@@ -19,4 +19,6 @@ public interface SetmealService {
 
     void update(SetmealVO setmealVO);
 
+    void Status(Integer status, Long id);
+
 }

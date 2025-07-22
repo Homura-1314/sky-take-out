@@ -94,4 +94,11 @@ public class SetmealControlller {
         return Result.success();
     }
 
+    @PostMapping("/status/{status}")
+    public Result Status(@PathVariable Integer status, Long id) {
+        log.info("修改套餐状态:{},{}", status, id);
+        setmealService.Status(status, id);
+        return Result.success();
+    }
+
 }
