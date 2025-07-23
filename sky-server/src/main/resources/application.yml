@@ -18,6 +18,10 @@ spring:
       max-file-size: 1GB
       # 最大请求大小(所有文件和表单)
       max-request-size: 2GB
+  redis:
+    host: ${sky.redis.host}
+    port: ${sky.redis.port}
+    database: ${sky.redis.database}
 
 mybatis:
   #mapper配置文件
@@ -43,6 +47,7 @@ sky:
     admin-ttl: 2592000000
     # 设置前端传递过来的令牌名称
     admin-token-name: token
+    
   alioss:
     endpoint: ${sky.alioss.endpoint}
     access-key-id: ${sky.alioss.access-key-id}
