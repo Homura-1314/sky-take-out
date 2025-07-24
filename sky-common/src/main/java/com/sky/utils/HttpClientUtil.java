@@ -1,6 +1,7 @@
 package com.sky.utils;
 
 import com.alibaba.fastjson.JSONObject;
+
 import org.apache.http.NameValuePair;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -16,9 +17,13 @@ import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.http.ParseException;
 
 /**
  * Http工具类
@@ -33,6 +38,7 @@ public class HttpClientUtil {
      * @param paramMap
      * @return
      */
+    @SuppressWarnings("CallToPrintStackTrace")
     public static String doGet(String url,Map<String,String> paramMap){
         // 创建Httpclient对象
         CloseableHttpClient httpClient = HttpClients.createDefault();
@@ -59,7 +65,7 @@ public class HttpClientUtil {
             if(response.getStatusLine().getStatusCode() == 200){
                 result = EntityUtils.toString(response.getEntity(),"UTF-8");
             }
-        }catch (Exception e){
+        }catch (IOException | URISyntaxException | ParseException e){
             e.printStackTrace();
         }finally {
             try {
@@ -107,7 +113,7 @@ public class HttpClientUtil {
             response = httpClient.execute(httpPost);
 
             resultString = EntityUtils.toString(response.getEntity(), "UTF-8");
-        } catch (Exception e) {
+        } catch (IOException | ParseException e) {
             throw e;
         } finally {
             try {
@@ -157,7 +163,7 @@ public class HttpClientUtil {
             response = httpClient.execute(httpPost);
 
             resultString = EntityUtils.toString(response.getEntity(), "UTF-8");
-        } catch (Exception e) {
+        } catch (IOException | UnsupportedCharsetException | ParseException e) {
             throw e;
         } finally {
             try {

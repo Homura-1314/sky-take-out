@@ -17,7 +17,7 @@ public class RedisConfiguration {
     public RedisTemplate<String, Object> reduRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
         // 创建 RedisTemplate 对象
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
-        
+        log.info("创建Redis：{}", redisConnectionFactory);
         // 设置连接工厂
         redisTemplate.setConnectionFactory(redisConnectionFactory);
 
