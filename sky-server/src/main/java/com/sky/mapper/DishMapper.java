@@ -42,4 +42,5 @@ public interface DishMapper {
 
     List<Dish> listByid(Integer categoryId);
 
+    List<Dish> list(Dish dish);
 }
