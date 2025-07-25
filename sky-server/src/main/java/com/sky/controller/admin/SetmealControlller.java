@@ -1,8 +1,10 @@
 package com.sky.controller.admin;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,7 +31,8 @@ public class SetmealControlller {
 
     @Autowired
     private SetmealService setmealService;
-
+    @Autowired
+    private RedisTemplate redisTemplate;
     /**
      * 
      * @param setmealPageQueryDTO
@@ -98,6 +101,8 @@ public class SetmealControlller {
     public Result Status(@PathVariable Integer status, Long id) {
         log.info("修改套餐状态:{},{}", status, id);
         setmealService.Status(status, id);
+        Set key = redisTemplate.keys("*dish_*");
+        redisTemplate.delete(key);
         return Result.success();
     }
 
