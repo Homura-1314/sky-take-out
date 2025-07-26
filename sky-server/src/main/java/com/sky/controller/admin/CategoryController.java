@@ -10,8 +10,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 分类管理
@@ -24,7 +26,8 @@ public class CategoryController {
 
     @Autowired
     private CategoryService categoryService;
-
+    @Autowired
+    private RedisTemplate redisTemplate;
     /**
      * 新增分类
      * @param categoryDTO
@@ -85,7 +88,9 @@ public class CategoryController {
     @PostMapping("/status/{status}")
     @ApiOperation("启用禁用分类")
     public Result<String> startOrStop(@PathVariable("status") Integer status, Long id){
-        categoryService.startOrStop(status,id);
+        categoryService.startOrStop(status, id);
+        Set key = redisTemplate.keys("*dish_*");
+        redisTemplate.delete(key);
         return Result.success();
     }
 

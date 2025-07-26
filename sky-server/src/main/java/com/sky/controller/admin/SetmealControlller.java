@@ -1,8 +1,12 @@
 package com.sky.controller.admin;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,7 +33,8 @@ public class SetmealControlller {
 
     @Autowired
     private SetmealService setmealService;
-
+    @Autowired
+    private RedisTemplate redisTemplate;
     /**
      * 
      * @param setmealPageQueryDTO
@@ -45,10 +50,11 @@ public class SetmealControlller {
 
     /**
      * 
-     * @param setmealVO
+     * @param setmealDTO
      * @return
      */
     @PostMapping
+    @Cacheable(cacheNames = "setmealCache", key = "#setmealDTO.categoryId")
     public Result save(@RequestBody SetmealDTO setmealDTO) {
         log.info("新增套餐：{}", setmealDTO);
         setmealService.save(setmealDTO);
@@ -62,6 +68,7 @@ public class SetmealControlller {
      */
 
     @DeleteMapping
+    @CacheEvict(cacheNames = "setmealCache", allEntries = true)
     public Result Delete(@RequestParam List<Long> ids) {
         log.info("根据id批量删除套餐：{}", ids);
         setmealService.delete(ids);
@@ -95,6 +102,7 @@ public class SetmealControlller {
     }
 
     @PostMapping("/status/{status}")
+    @CacheEvict(cacheNames = "setmealCache", allEntries = true)
     public Result Status(@PathVariable Integer status, Long id) {
         log.info("修改套餐状态:{},{}", status, id);
         setmealService.Status(status, id);

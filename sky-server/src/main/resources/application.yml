@@ -14,10 +14,14 @@ spring:
       password: ${sky.datasource.password}
   servlet:
     multipart:
-      # 最大单个文件大小
+      # 最大单个文件大小 
       max-file-size: 1GB
       # 最大请求大小(所有文件和表单)
       max-request-size: 2GB
+  redis:
+    host: ${sky.redis.host}
+    port: ${sky.redis.port}
+    database: ${sky.redis.database}
 
 mybatis:
   #mapper配置文件
@@ -43,9 +47,15 @@ sky:
     admin-ttl: 2592000000
     # 设置前端传递过来的令牌名称
     admin-token-name: token
+    user-secret-key: hikari
+    user-ttl: 2592000000
+    user-token-name: authentication
   alioss:
     endpoint: ${sky.alioss.endpoint}
     access-key-id: ${sky.alioss.access-key-id}
     access-key-secret: ${sky.alioss.access-key-secret}
     bucket-name: ${sky.alioss.bucket-name}
     
+  wechat:
+    appid: ${sky.wechat.appid}
+    secret: ${sky.wechat.secret}

@@ -11,3 +11,11 @@ sky:
     access-key-id: LTAI5tPiLaP8sMxTqe9iVgRP
     access-key-secret: 97BN0J0lgkWUWS9JO6tGrk12CNqaEf
     bucket-name: hikaritext
+  redis:
+    host: localhost
+    port: 6379
+    database: 0
+  
+  wechat:
+    appid: wxbb98e0d99aa8132f
+    secret: e64d88994c1f8a014404c5d074db40f9
