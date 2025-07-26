@@ -20,7 +20,7 @@ public interface DishService {
 
     void updata(DishDTO dishDTO);
 
-    List<Dish> listByid(Integer categoryid);
+    List<Dish> listByid(Long categoryid);
 
 
     /**

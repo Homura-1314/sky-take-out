@@ -40,7 +40,7 @@ public interface DishMapper {
     @AutoFill(value = OperationType.UPDATE)
     void update(Dish dish);
 
-    List<Dish> listByid(Integer categoryId);
+    List<Dish> listByid(Long categoryId);
 
     List<Dish> list(Dish dish);
 }
