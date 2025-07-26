@@ -56,4 +56,12 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         shoppingCart.setCreateTime(LocalDateTime.now());
         shoppingMapper.insert(shoppingCart);
     }
+
+    @Override
+    public List<ShoppingCart> showShopping() {
+        ShoppingCart cartBuilder = ShoppingCart.builder()
+                .userId(BaseContext.getCurrentId())
+                .build();
+        return shoppingMapper.list(cartBuilder);
+    }
 }
