@@ -1,6 +1,7 @@
 package com.sky.controller.user;
 
 import com.sky.entity.ShoppingCart;
+import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,6 +33,13 @@ public class ShoppingCartController {
         log.info("查看购物车");
         List<ShoppingCart> shoppingCarts = shoppingCartService.showShopping();
         return Result.success(shoppingCarts);
+    }
+
+    @DeleteMapping("/clean")
+    public Result clean(){
+        log.info("清空购物车");
+        shoppingCartService.cleanShopping();
+        return Result.success();
     }
 
 }

@@ -64,4 +64,10 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
                 .build();
         return shoppingMapper.list(cartBuilder);
     }
+
+    @Override
+    public void cleanShopping() {
+        Long userid = BaseContext.getCurrentId();
+        shoppingMapper.cleanShopping(userid);
+    }
 }
