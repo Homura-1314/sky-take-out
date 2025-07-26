@@ -1,6 +1,7 @@
 package com.sky.service.impl;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.BeanUtils;
@@ -70,4 +71,14 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         Long userid = BaseContext.getCurrentId();
         shoppingMapper.cleanShopping(userid);
     }
+
+    @Override
+    public void deleteShopping(ShoppingCartDTO shoppingCartDTO) {
+        ShoppingCart shoppingCart = new ShoppingCart();
+        BeanUtils.copyProperties(shoppingCartDTO, shoppingCart);
+        Long userId = BaseContext.getCurrentId();
+        shoppingCart.setUserId(userId);
+        shoppingMapper.deleteShopping(shoppingCart);
+    }
+
 }

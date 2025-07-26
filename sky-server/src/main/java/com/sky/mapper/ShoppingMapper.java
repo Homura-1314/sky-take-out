@@ -22,4 +22,6 @@ public interface ShoppingMapper {
 
     @Delete("delete from shopping_cart where user_id = #{userId}")
     void cleanShopping(Long userid);
+
+    void deleteShopping(ShoppingCart shoppingCart);
 }
