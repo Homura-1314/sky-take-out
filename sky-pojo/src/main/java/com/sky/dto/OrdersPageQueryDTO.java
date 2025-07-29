@@ -1,10 +1,11 @@
 package com.sky.dto;
 
-import lombok.Data;
-import org.springframework.format.annotation.DateTimeFormat;
-
 import java.io.Serializable;
 import java.time.LocalDateTime;
+
+import org.springframework.format.annotation.DateTimeFormat;
+
+import lombok.Data;
 
 @Data
 public class OrdersPageQueryDTO implements Serializable {

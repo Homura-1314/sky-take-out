@@ -14,4 +14,49 @@
                      #{deliveryTime}, #{packAmount}, #{tablewareNumber}
                     )
         </insert>
+    <select id="page" resultType="com.sky.entity.Orders">
+        select * from orders
+        <where>
+            <if test="userId != null">
+                and user_id = #{userId}
+            </if>
+            <if test="number != null and number != ''">
+                and number like concat('%', #{number}, '%')
+            </if>
+            <if test="phone != null and phone != ''">
+                and phone like concat('%', #{phone}, '%')
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="beginTime != null">
+                and order_time = #{beginTime}
+            </if>
+            <if test="endTime != null">
+                and delivery_time = #{endTime}
+            </if>
+        </where>
+        order by order_time desc
+    </select>
+    <select id="getStatistics" resultType="com.sky.vo.OrderStatisticsVO">
+        select
+            sum(if(status = 2, 1, 0)) as toBeConfirmed,
+            sum(if(status = 3, 1, 0)) as confirmed,
+            sum(if(status = 4, 1, 0)) as deliveryInProgress
+        from
+            orders
+    </select>
+    <select id="pageUser" resultType="com.sky.dto.OrdersDTOS">
+        select * from orders
+        <where>
+            <if test="status != null">status = #{status}</if>
+        </where>
+    </select>
+    <select id="pageQuery" resultType="com.sky.entity.Orders">
+            select * from orders
+            <where>
+                <if test="userId != null">user_id = #{userId}</if>
+                <if test="status != null">and status = #{status}</if>
+            </where>
+    </select>
 </mapper>
