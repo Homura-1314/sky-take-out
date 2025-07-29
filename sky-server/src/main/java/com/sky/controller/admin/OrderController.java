@@ -3,6 +3,7 @@ package com.sky.controller.admin;
 import com.sky.dto.OrdersDTOS;
 import com.sky.dto.OrdersRejectionDTO;
 import com.sky.vo.OrderStatisticsVO;
+import com.sky.vo.OrderVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -66,10 +67,10 @@ public class OrderController {
     }
 
     @GetMapping("/details/{id}")
-    public Result<OrdersDTOS> details(@PathVariable Integer id){
+    public Result<OrderVO> details(@PathVariable Integer id){
         log.info("根据id查询订单信息：{}", id);
-        OrdersDTOS ordersDTOS = orderService.details(id);
-        return Result.success(ordersDTOS);
+        OrderVO orderVO = orderService.details(id);
+        return Result.success(orderVO);
     }
 
     @PutMapping("/delivery/{id}")

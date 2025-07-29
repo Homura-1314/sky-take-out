@@ -11,5 +11,5 @@ public interface OrderDetailMapper {
 
     void insertBatch(List<OrderDetail> orderDetails);
     @Select("select * from order_detail where order_id = #{id}")
-    List<OrderDetail> selete(Integer id);
+    List<OrderDetail> selete(Long id);
 }

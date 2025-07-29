@@ -2,6 +2,7 @@ package com.sky.mapper;
 
 import com.sky.dto.OrdersDTOS;
 import com.sky.dto.OrdersRejectionDTO;
+import com.sky.vo.OrderVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -30,7 +31,7 @@ public interface OrderMapper {
     @Update("update orders set status = 3 where id = #{id}")
     void confirm(Integer id);
     @Select("select * from orders where id = #{id}")
-    OrdersDTOS selete(Integer id);
+    OrderVO selete(Integer id);
     @Update("update orders set status = 4 where id = #{id}")
     void delivery(Integer id);
 

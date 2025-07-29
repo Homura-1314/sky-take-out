@@ -19,3 +19,11 @@ sky:
   wechat:
     appid: wxbb98e0d99aa8132f
     secret: e64d88994c1f8a014404c5d074db40f9
+
+  baidu:
+    shop: 北京市海滨区上地十街10号
+    ak: ZtlcVroZELJTv6p6NuvHVk7tXTi9rxXe
+    geocidubg-url: http://api.map.baidu.com/geocoding/v3/?address={address}&output=json&ak={ak}
+    max-delivery: 5000
+    shop-coordinates: "40.057031,116.307852"
+    planning-url: "https://api.map.baidu.com/direction/v2/riding?origin={origin}&destination={destination}&ak={ak}"

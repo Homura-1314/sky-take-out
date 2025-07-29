@@ -59,3 +59,11 @@ sky:
   wechat:
     appid: ${sky.wechat.appid}
     secret: ${sky.wechat.secret}
+
+  baidu:
+    ak: ${sky.baidu.ak}
+    shop: ${sky.shop.shop}
+    geocidubg-url: ${sky.baidu.geocidubg-url}
+    max-delivery: ${sky.baidu.max-delivery}
+    shop-coordinates: ${sky.baidu.shop-coordinates}
+    planning-url: ${sky.baidu.planning-url}
