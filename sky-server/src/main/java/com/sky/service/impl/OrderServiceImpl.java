@@ -1,5 +1,6 @@
 package com.sky.service.impl;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,35 +8,48 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.alibaba.fastjson.JSON;
-import com.sky.dto.*;
-import com.sky.websocket.WebSocketServer;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
 import com.sky.context.BaseContext;
+import com.sky.dto.OrdersCancelDTO;
+import com.sky.dto.OrdersConfirmDTO;
+import com.sky.dto.OrdersDTOS;
+import com.sky.dto.OrdersPageQueryDTO;
+import com.sky.dto.OrdersPaymentDTO;
+import com.sky.dto.OrdersRejectionDTO;
+import com.sky.dto.OrdersSubmitDTO;
 import com.sky.entity.AddressBook;
 import com.sky.entity.OrderDetail;
 import com.sky.entity.Orders;
 import com.sky.entity.ShoppingCart;
+import com.sky.entity.User;
 import com.sky.exception.OrderBusinessException;
 import com.sky.exception.ShoppingCartBusinessException;
 import com.sky.mapper.AddressBookMapper;
 import com.sky.mapper.OrderDetailMapper;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.ShoppingMapper;
+import com.sky.mapper.UserMapper;
 import com.sky.result.PageResult;
 import com.sky.service.OrderService;
 import com.sky.utils.BaiduSDK;
+import com.sky.utils.WeChatPayUtil;
+import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
+import com.sky.websocket.WebSocketServer;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -56,8 +70,15 @@ public class OrderServiceImpl implements OrderService {
     private long Max_delivery;
     @Value("${sky.baidu.shop-coordinates}")
     private String shopCoordinates;
+    @Value("${sky.payment.mock-enabled}")
+    private boolean mockEnabled;
+    @Autowired
+    private WeChatPayUtil weChatPayUtil;
     @Autowired
     private WebSocketServer webSocketServer;
+    @Autowired
+    private UserMapper userMapper;
+    private RestTemplate restTemplate = new RestTemplate();
 
     @Override
     @Transactional
@@ -93,6 +114,7 @@ public class OrderServiceImpl implements OrderService {
         orders.setConsignee(addressBook.getConsignee());
         orders.setUserId(id);
         orders.setAddress(userAddress);
+        orders.setTablewareStatus(Orders.PENDING_PAYMENT);
         orderMapper.insert(orders);
         // 向订单插入n条数据
         List<OrderDetail> orderDetails = new ArrayList<>();
@@ -130,8 +152,12 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void complete(Integer id) {
-        orderMapper.complete(id);
+    public void complete(Long id) {
+        Orders build = Orders.builder()
+                .id(id)
+                .status(Orders.COMPLETED)
+                .build();
+        orderMapper.complete(build);
     }
 
     @Override
@@ -140,8 +166,12 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void confirm(Integer id) {
-        orderMapper.confirm(id);
+    public void confirm(OrdersConfirmDTO ordersConfirmDTO) {
+        Orders build = Orders.builder()
+                .id(ordersConfirmDTO.getId())
+                .status(Orders.CONFIRMED)
+                .build();
+        orderMapper.confirm(build);
     }
 
     @Override
@@ -215,7 +245,56 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public LocalDateTime payment(OrdersPaymentDTO ordersPaymentDTO) {
+    public OrderPaymentVO payment(OrdersPaymentDTO ordersPaymentDTO) throws Exception {
+        if (mockEnabled) {
+            log.warn("当前为模拟支付流程，跳过真实微信支付...");
+            String orderNumber = ordersPaymentDTO.getOrderNumber();
+            // 构造模拟回调的 URL
+            String notifyUrl = "http://localhost:8080/notify/paySuccess/mock?orderNumber=" + orderNumber;
+            try {
+                restTemplate.getForObject(notifyUrl, String.class);
+            } catch (RestClientException e) {
+                log.error("自动模拟回调失败，请检查/notify/paySuccess/mock接口是否正常", e);
+            }
+            // 立即将订单状态改为“已支付”，以便后续流程能够进行
+            paySuccess(ordersPaymentDTO.getOrderNumber());
+            OrderPaymentVO vo = OrderPaymentVO.builder()
+                    .nonceStr("mockNonceStr" + System.currentTimeMillis()) // 模拟一个随机字符串
+                    .paySign("mockPaySign" + System.currentTimeMillis())   // 模拟一个签名
+                    .timeStamp(String.valueOf(System.currentTimeMillis() / 1000)) // 模拟一个时间戳 (秒)
+                    .signType("RSA") // 模拟签名算法
+                    .packageStr("prepay_id=mockPrepayId" + System.currentTimeMillis()) // 模拟 package 字符串
+                    .build();
+            return vo;
+        }
+        Long userId = BaseContext.getCurrentId();
+        User user = userMapper.getByOpenid(String.valueOf(userId));
+
+        JSONObject jsonObject = weChatPayUtil.pay(
+                ordersPaymentDTO.getOrderNumber(),
+                new BigDecimal("0.01"),
+                "苍穹外卖订单",
+                user.getOpenid()
+        );
+
+        if (jsonObject.getString("code") != null && jsonObject.getString("code").equals("ORDERPAID")) {
+            throw new OrderBusinessException("该订单已支付");
+        }
+        OrderPaymentVO vo = jsonObject.toJavaObject(OrderPaymentVO.class);
+        vo.setPackageStr(jsonObject.getString("package"));
+
+        return vo;
+    }
+
+    /**
+     * 支付成功，修改订单状态
+     *
+     * @param outTradeNo
+     */
+    @Override
+    public void paySuccess(String outTradeNo) {
+        // 根据订单号查询订单
+        Orders ordersDB = orderMapper.getByNumber(outTradeNo);
         // 根据用户id查询当前的地址
         Long userid = BaseContext.getCurrentId();
         AddressBook addressBook = addressBookMapper.getById(userid);
@@ -228,13 +307,20 @@ public class OrderServiceImpl implements OrderService {
         // 计算预计到达的时间
         long timeConsuming = baiduSDK.getTimeConsuming(coordinates, shopCoordinates);
         LocalDateTime dateTime = LocalDateTime.now().plusMinutes(timeConsuming);
-        orderMapper.updateTiemOut(ordersPaymentDTO, userid, dateTime);
+        // 根据订单id更新订单的状态、支付方式、支付状态、结账时间
+        Orders orders = Orders.builder()
+                .id(ordersDB.getId())
+                .status(Orders.TO_BE_CONFIRMED)
+                .payStatus(Orders.PAID)
+                .checkoutTime(LocalDateTime.now())
+                .estimatedDeliveryTime(dateTime)
+                .build();
+        orderMapper.update(orders);
         Map map = new HashMap<>();
         map.put("type", 1); // 1表示来单提醒 2表示客户催单
         map.put("orderId", userid);
-        map.put("content", "订单号" + ordersPaymentDTO.getOrderNumber());
+        map.put("content", "订单号" + outTradeNo);
         String json = JSON.toJSONString(map);
         webSocketServer.sendToAllClient(json);
-        return dateTime;
     }
 }

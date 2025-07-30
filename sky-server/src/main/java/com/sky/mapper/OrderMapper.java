@@ -25,12 +25,12 @@ public interface OrderMapper {
     @Update("update orders set status = 6, cancel_reason = #{cancelReason} where id = #{id}")
     void cancel(OrdersCancelDTO ordersCancelDTO);
 
-    @Update("update orders set status = 5 where id = #{id}")
-    void complete(Integer id);
+    @Update("update orders set status = #{status} where id = #{id}")
+    void complete(Orders orders);
     @Update("update orders set rejection_reason = #{rejectionReason} where id = #{id}")
     void rejection(OrdersRejectionDTO ordersRejectionDTO);
-    @Update("update orders set status = 3 where id = #{id}")
-    void confirm(Integer id);
+    @Update("update orders set status = #{status} where id = #{id}")
+    void confirm(Orders orders);
     @Select("select * from orders where id = #{id}")
     OrderVO selete(Integer id);
     @Update("update orders set status = 4 where id = #{id}")
@@ -59,4 +59,17 @@ public interface OrderMapper {
             "number = #{ordersPaymentDTO.orderNumber}, pay_status = 1, checkout_time = now()," +
             "status = 2 where id = #{userid}")
     void updateTiemOut(OrdersPaymentDTO ordersPaymentDTO, Long userid, LocalDateTime dateTime);
+
+    /**
+     * 根据订单号查询订单
+     * @param orderNumber
+     */
+    @Select("select * from orders where number = #{orderNumber}")
+    Orders getByNumber(String orderNumber);
+
+    /**
+     * 修改订单信息
+     * @param orders
+     */
+    void update(Orders orders);
 }

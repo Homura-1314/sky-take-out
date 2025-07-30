@@ -1,21 +1,28 @@
-package com.sky.controller.notify;
+package com.sky.controller.nofity;
+
+import java.io.BufferedReader;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.http.entity.ContentType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.druid.support.json.JSONUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.sky.properties.WeChatProperties;
+import com.sky.result.Result;
 import com.sky.service.OrderService;
 import com.wechat.pay.contrib.apache.httpclient.util.AesUtil;
+
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.entity.ContentType;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 
 /**
  * 支付回调相关接口
@@ -58,6 +65,19 @@ public class PayNotifyController {
         responseToWeixin(response);
     }
 
+     /**
+     *
+     * 模拟微信支付成功的回调通知
+     * @param orderNumber 商户订单号
+     * @return
+     */
+    @GetMapping("/paySuccess/mock")
+    public Result<String> mockPaySuccessNotify(@RequestParam String orderNumber) {
+        log.warn("接收到【模拟】支付成功回调，订单号: {}", orderNumber);
+        orderService.paySuccess(orderNumber);
+        return Result.success("模拟回调成功，订单 " + orderNumber + " 状态已更新");
+    }
+
     /**
      * 读取数据
      *
@@ -70,7 +90,7 @@ public class PayNotifyController {
         StringBuilder result = new StringBuilder();
         String line = null;
         while ((line = reader.readLine()) != null) {
-            if (result.length() > 0) {
+            if (!result.isEmpty()) {
                 result.append("\n");
             }
             result.append(line);

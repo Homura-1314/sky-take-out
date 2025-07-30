@@ -59,6 +59,8 @@ sky:
   wechat:
     appid: ${sky.wechat.appid}
     secret: ${sky.wechat.secret}
+    notify-url: ${sky.wechat.notify-url}
+    refund-notify-url: ${sky.wechat.refund-notify-url}
 
   baidu:
     ak: ${sky.baidu.ak}
@@ -67,3 +69,5 @@ sky:
     max-delivery: ${sky.baidu.max-delivery}
     shop-coordinates: ${sky.baidu.shop-coordinates}
     planning-url: ${sky.baidu.planning-url}
+  payment:
+    mock-enabled: true

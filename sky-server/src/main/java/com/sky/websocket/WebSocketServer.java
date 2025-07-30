@@ -1,8 +1,9 @@
 package com.sky.websocket;
 
+import java.io.IOException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.websocket.OnClose;
 import javax.websocket.OnMessage;
@@ -21,7 +22,7 @@ import org.springframework.stereotype.Component;
 public class WebSocketServer {
 
     //存放会话对象
-    private static final Map<String, Session> sessionMap = new HashMap();
+    private static final Map<String, Session> sessionMap = new ConcurrentHashMap<>();
 
     /**
      * 连接建立成功调用的方法
@@ -64,7 +65,7 @@ public class WebSocketServer {
             try {
                 //服务器向客户端发送消息
                 session.getBasicRemote().sendText(message);
-            } catch (Exception e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }

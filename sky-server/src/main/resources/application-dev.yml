@@ -19,6 +19,8 @@ sky:
   wechat:
     appid: wxbb98e0d99aa8132f
     secret: e64d88994c1f8a014404c5d074db40f9
+    notify-url: https://28b202cd.r11.cpolar.top
+    refund-notify-url: https://28b202cd.r11.cpolar.top
 
   baidu:
     shop: 北京市海滨区上地十街10号
