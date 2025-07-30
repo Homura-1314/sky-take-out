@@ -2,9 +2,14 @@ package com.sky.service.impl;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.alibaba.fastjson.JSON;
+import com.sky.dto.*;
+import com.sky.websocket.WebSocketServer;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,11 +20,6 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
 import com.sky.context.BaseContext;
-import com.sky.dto.OrdersCancelDTO;
-import com.sky.dto.OrdersDTOS;
-import com.sky.dto.OrdersPageQueryDTO;
-import com.sky.dto.OrdersRejectionDTO;
-import com.sky.dto.OrdersSubmitDTO;
 import com.sky.entity.AddressBook;
 import com.sky.entity.OrderDetail;
 import com.sky.entity.Orders;
@@ -56,6 +56,8 @@ public class OrderServiceImpl implements OrderService {
     private long Max_delivery;
     @Value("${sky.baidu.shop-coordinates}")
     private String shopCoordinates;
+    @Autowired
+    private WebSocketServer webSocketServer;
 
     @Override
     @Transactional
@@ -210,5 +212,29 @@ public class OrderServiceImpl implements OrderService {
 
         // 将购物车对象批量添加到数据库
         shoppingMapper.insert_for(shoppingCartList);
+    }
+
+    @Override
+    public LocalDateTime payment(OrdersPaymentDTO ordersPaymentDTO) {
+        // 根据用户id查询当前的地址
+        Long userid = BaseContext.getCurrentId();
+        AddressBook addressBook = addressBookMapper.getById(userid);
+        // 获得用户的地址
+        String userAddress  = addressBook.getProvinceName() + addressBook.getCityName() +
+                addressBook.getDistrictName() + addressBook.getDetail();
+        // 将地址转化为坐标
+        String coordinates = baiduSDK.getCoordinates(userAddress);
+        if (coordinates == null || coordinates.isEmpty()) throw new OrderBusinessException("收货地址解析失败，无法计算配送距离");
+        // 计算预计到达的时间
+        long timeConsuming = baiduSDK.getTimeConsuming(coordinates, shopCoordinates);
+        LocalDateTime dateTime = LocalDateTime.now().plusMinutes(timeConsuming);
+        orderMapper.updateTiemOut(ordersPaymentDTO, userid, dateTime);
+        Map map = new HashMap<>();
+        map.put("type", 1); // 1表示来单提醒 2表示客户催单
+        map.put("orderId", userid);
+        map.put("content", "订单号" + ordersPaymentDTO.getOrderNumber());
+        String json = JSON.toJSONString(map);
+        webSocketServer.sendToAllClient(json);
+        return dateTime;
     }
 }

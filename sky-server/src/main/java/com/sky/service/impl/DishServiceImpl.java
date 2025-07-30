@@ -2,6 +2,7 @@ package com.sky.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -156,13 +157,13 @@ public class DishServiceImpl implements DishService{
             .status(status)
             .build();
         dishMapper.update(dish);
-        if (status == StatusConstant.DISABLE) {
+        if (Objects.equals(status, StatusConstant.DISABLE)) {
             // 如果是停售操作，还需要将包含当前菜品的套餐也停售
             List<Long> dishIds = new ArrayList<>();
             dishIds.add(id);
             // select setmeal_id from setmeal_dish where dish_id in (?,?,?)
             List<Long> setmealIds = setneakDishMapper.getSetmealIds(dishIds);
-            if (setmealIds != null && setmealIds.size() > 0) {
+            if (setmealIds != null && !setmealIds.isEmpty()) {
                 for (Long setmealId : setmealIds) {
                     Setmeal setmeal = Setmeal.builder()
                         .id(setmealId)

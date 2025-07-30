@@ -1,16 +1,12 @@
 package com.sky.mapper;
 
-import com.sky.dto.OrdersDTOS;
-import com.sky.dto.OrdersRejectionDTO;
+import com.sky.dto.*;
 import com.sky.vo.OrderVO;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 import com.github.pagehelper.Page;
-import com.sky.dto.OrdersCancelDTO;
-import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.entity.Orders;
 import com.sky.vo.OrderStatisticsVO;
 import org.springframework.data.repository.query.Param;
@@ -58,4 +54,9 @@ public interface OrderMapper {
                            @Param("cancelReason") String cancelReason,
                            @Param("cancelTime") LocalDateTime cancelTime,
                            @Param("ids") List<Long> ids);
+    @Update("update orders set pay_method = #{ordersPaymentDTO.payMethod}, " +
+            "estimated_delivery_time = #{dateTime}," +
+            "number = #{ordersPaymentDTO.orderNumber}, pay_status = 1, checkout_time = now()," +
+            "status = 2 where id = #{userid}")
+    void updateTiemOut(OrdersPaymentDTO ordersPaymentDTO, Long userid, LocalDateTime dateTime);
 }

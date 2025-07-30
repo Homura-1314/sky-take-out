@@ -1,14 +1,13 @@
 package com.sky.service;
 
-import com.sky.dto.OrdersCancelDTO;
-import com.sky.dto.OrdersPageQueryDTO;
-import com.sky.dto.OrdersRejectionDTO;
-import com.sky.dto.OrdersSubmitDTO;
+import com.sky.dto.*;
 import com.sky.entity.Orders;
 import com.sky.result.PageResult;
 import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
+
+import java.time.LocalDateTime;
 
 public interface OrderService {
 
@@ -33,4 +32,6 @@ public interface OrderService {
     PageResult historyOrders(int page , int pageSize, Integer status);
 
     void repetition(Long id);
+
+    LocalDateTime payment(OrdersPaymentDTO ordersPaymentDTO);
 }
