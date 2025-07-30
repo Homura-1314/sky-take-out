@@ -5,10 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.sky.exception.OrderBusinessException;
-import com.sky.utils.BaiduSDK;
-import com.sky.vo.OrderVO;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,7 +24,7 @@ import com.sky.entity.AddressBook;
 import com.sky.entity.OrderDetail;
 import com.sky.entity.Orders;
 import com.sky.entity.ShoppingCart;
-import com.sky.exception.AddressBookBusinessException;
+import com.sky.exception.OrderBusinessException;
 import com.sky.exception.ShoppingCartBusinessException;
 import com.sky.mapper.AddressBookMapper;
 import com.sky.mapper.OrderDetailMapper;
@@ -36,8 +32,12 @@ import com.sky.mapper.OrderMapper;
 import com.sky.mapper.ShoppingMapper;
 import com.sky.result.PageResult;
 import com.sky.service.OrderService;
+import com.sky.utils.BaiduSDK;
 import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
+import com.sky.vo.OrderVO;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
@@ -52,8 +52,6 @@ public class OrderServiceImpl implements OrderService {
     private ShoppingMapper shoppingMapper;
     @Autowired
     private BaiduSDK baiduSDK;
-    @Value("${sky.baidu.shop}")
-    private String shop;
     @Value("${sky.baidu.max-delivery}")
     private long Max_delivery;
     @Value("${sky.baidu.shop-coordinates}")
@@ -160,6 +158,7 @@ public class OrderServiceImpl implements OrderService {
         orderMapper.delivery(id);
     }
 
+    @SuppressWarnings("null")
     @Override
     public PageResult<OrdersDTOS> historyOrders(int page, int pageSize, Integer status) {
         // 设置分页

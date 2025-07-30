@@ -24,6 +24,7 @@ public class BaiduSDK {
      * @param address 详细地址文字
      * @return "lat,lng" 格式的字符串，例如 "116.307852,40.057031"，获取失败返回 null
      */
+    @SuppressWarnings("CallToPrintStackTrace")
     public String getCoordinates(String address) {
         RestTemplate restTemplate = new RestTemplate();
         ObjectMapper objectMapper = new ObjectMapper();
@@ -38,17 +39,17 @@ public class BaiduSDK {
                 // 2. 修正返回格式为 "纬度,经度"
                 return lat + "," + lng;
             }
-            // ... (省略错误处理) ...
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (JsonProcessingException | RestClientException e) { e.printStackTrace(); }
         return null;
     }
 
     /**
      * 计算两点之间的骑行距离
-     * @param origin      起点坐标，格式 "lng,lat"
-     * @param destination 终点坐标，格式 "lng,lat"
+     * @param origin      起点坐标，格式 "lat,lng"
+     * @param destination 终点坐标，格式 "lat,lng"
      * @return 距离（单位：米），获取失败返回 -1
      */
+    @SuppressWarnings("CallToPrintStackTrace")
     public long getRidingDistance(String origin, String destination) {
         RestTemplate restTemplate = new RestTemplate();
         ObjectMapper objectMapper = new ObjectMapper();

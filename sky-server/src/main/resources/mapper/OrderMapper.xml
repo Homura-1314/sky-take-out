@@ -14,6 +14,17 @@
                      #{deliveryTime}, #{packAmount}, #{tablewareNumber}
                     )
         </insert>
+    <update id="updateStatusByIds">
+        update orders
+        set
+        status = #{status},
+        cancel_reason = #{cancelReason},
+        cancel_time = #{cancelTime}
+        where id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
     <select id="page" resultType="com.sky.entity.Orders">
         select * from orders
         <where>

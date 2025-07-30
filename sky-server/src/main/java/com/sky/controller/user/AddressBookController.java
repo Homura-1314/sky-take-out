@@ -1,14 +1,24 @@
 package com.sky.controller.user;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.sky.context.BaseContext;
 import com.sky.entity.AddressBook;
 import com.sky.result.Result;
 import com.sky.service.AddressBookService;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import java.util.List;
 
 @RestController
 @RequestMapping("/user/addressBook")
@@ -94,7 +104,7 @@ public class AddressBookController {
     /**
      * 查询默认地址
      */
-    @GetMapping("default")
+    @GetMapping("/default")
     @ApiOperation("查询默认地址")
     public Result<AddressBook> getDefault() {
         //SQL:select * from address_book where user_id = ? and is_default = 1
