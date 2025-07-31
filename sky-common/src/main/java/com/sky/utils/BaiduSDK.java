@@ -1,18 +1,16 @@
 package com.sky.utils;
 
+import java.net.URI;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.web.util.UriComponentsBuilder;
-
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 public class BaiduSDK {
@@ -41,7 +39,7 @@ public class BaiduSDK {
                 JsonNode locationNode = rootNode.path("result").path("location");
                 double lng = locationNode.path("lng").asDouble();
                 double lat = locationNode.path("lat").asDouble();
-                // 2. 修正返回格式为 "纬度,经度"
+                // 2. 返回格式为 "纬度,经度"
                 return lat + "," + lng;
             }
         } catch (JsonProcessingException | RestClientException e) { e.printStackTrace(); }

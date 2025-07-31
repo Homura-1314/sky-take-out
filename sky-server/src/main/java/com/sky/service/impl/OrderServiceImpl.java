@@ -140,10 +140,34 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public PageResult<Orders> page(OrdersPageQueryDTO ordersPageQueryDTO) {
+    public PageResult<OrderVO> page(OrdersPageQueryDTO ordersPageQueryDTO) {
         PageHelper.startPage(ordersPageQueryDTO.getPage(), ordersPageQueryDTO.getPageSize());
         Page<Orders> page = orderMapper.page(ordersPageQueryDTO);
-        return new PageResult<>(page.getTotal(), page.getResult());
+        List<OrderVO> list = new ArrayList<>();
+        // 3. 判断是否有订单数据
+        if (page != null && !page.isEmpty()) {
+            // 4. 遍历分页查询出的每一个订单
+            for (Orders orders : page) {
+                // a. 创建一个新的 OrderVO 对象，用于组装最终结果
+                OrderVO orderVO = new OrderVO();
+                BeanUtils.copyProperties(orders, orderVO);
+
+                // c. 根据当前订单的 ID，查询其对应的订单详情列表
+                Long orderId = orders.getId();
+                List<OrderDetail> orderDetails = orderDetailMapper.selete(orderId);
+
+                // d. 将查询到的订单详情列表设置到 OrderVO 中
+                orderVO.setOrderDetailList(orderDetails);
+                List<String> ss = new ArrayList<>();
+                for (OrderDetail orderDetail : orderDetails) {
+                    ss.add(orderDetail.getName());
+                }
+                orderVO.setOrderDishes(ss);
+                // e. 将组装好的 OrderVO 添加到最终的结果列表中
+                list.add(orderVO);
+            }
+        }
+        return new PageResult<>(page.getTotal(), list);
     }
 
     @Override
@@ -295,6 +319,9 @@ public class OrderServiceImpl implements OrderService {
     public void paySuccess(String outTradeNo) {
         // 根据订单号查询订单
         Orders ordersDB = orderMapper.getByNumber(outTradeNo);
+        if (ordersDB == null || ordersDB.getStatus().equals(Orders.DELIVERY_IN_PROGRESS)){
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
         // 根据用户id查询当前的地址
         Long userid = BaseContext.getCurrentId();
         AddressBook addressBook = addressBookMapper.getById(userid);
@@ -322,5 +349,20 @@ public class OrderServiceImpl implements OrderService {
         map.put("content", "订单号" + outTradeNo);
         String json = JSON.toJSONString(map);
         webSocketServer.sendToAllClient(json);
+    }
+
+    @Override
+    public void reminder(Long id) {
+        // 根据订单号查询订单
+        Orders ordersDB = orderMapper.getById(id);
+        if (ordersDB == null || ordersDB.getStatus().equals(Orders.DELIVERY_IN_PROGRESS)){
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+        Map<String, Object> map = new HashMap<>();
+        map.put("type", 2);
+        map.put("orderId", id);
+        map.put("content", ordersDB.getNumber());
+        String jsonString = JSON.toJSONString(map);
+        webSocketServer.sendToAllClient(jsonString);
     }
 }
