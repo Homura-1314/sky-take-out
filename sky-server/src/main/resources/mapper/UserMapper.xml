@@ -9,4 +9,21 @@
                 insert into user (openid, name, phone, sex, id_number, avatar, create_time) values (
                 #{openid}, #{name}, #{phone}, #{sex}, #{idNumber}, #{avatar}, #{createTime})
         </insert>
+
+        <select id="countNewUsersByDateRange" resultType="com.sky.dto.UserStatisticsDTO">
+                select
+                DATE(create_time) as date,
+                count(id) as newUserCount
+                from
+                user
+                where
+                create_time &gt;= #{beginTime} and create_time &lt;= #{endTime}
+                group by
+                DATE(create_time)
+                order by
+                date asc
+        </select>
+        <select id="countTotalUsersBeforeDate" resultType="java.lang.Integer">
+                select count(id) from user where create_time &lt; #{beginTime}
+        </select>
 </mapper>
