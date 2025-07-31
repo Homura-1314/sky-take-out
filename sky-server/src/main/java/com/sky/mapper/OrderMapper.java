@@ -2,6 +2,7 @@ package com.sky.mapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -26,7 +27,7 @@ public interface OrderMapper {
     Page<Orders> page(OrdersPageQueryDTO ordersPageQueryDTO);
 
     OrderStatisticsVO getStatistics();
-    @Update("update orders set status = 6, cancel_reason = #{cancelReason} where id = #{id}")
+    @Update("update orders set status = 6, cancel_reason = #{cancelReason}, cancel_time = now() where id = #{id}")
     void cancel(OrdersCancelDTO ordersCancelDTO);
 
     @Update("update orders set status = #{status} where id = #{id}")
@@ -37,8 +38,8 @@ public interface OrderMapper {
     void confirm(Orders orders);
     @Select("select * from orders where id = #{id}")
     OrderVO selete(Integer id);
-    @Update("update orders set status = 4 where id = #{id}")
-    void delivery(Integer id);
+    @Update("update orders set status = 4, delivery_time = #{estimatedDeliveryTime} where id = #{id}")
+    void delivery(Integer id, LocalDateTime estimatedDeliveryTime);
 
     Page<OrdersDTOS> pageUser(int page, int pageSize, Integer status);
 
@@ -78,4 +79,6 @@ public interface OrderMapper {
     void update(Orders orders);
     @Select("select * from orders where id = #{id}")
     Orders getById(Long id);
+
+    Double sumBymap(Map map);
 }

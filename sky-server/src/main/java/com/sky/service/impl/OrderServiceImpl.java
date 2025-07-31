@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -158,16 +159,16 @@ public class OrderServiceImpl implements OrderService {
 
                 // d. 将查询到的订单详情列表设置到 OrderVO 中
                 orderVO.setOrderDetailList(orderDetails);
-                List<String> ss = new ArrayList<>();
-                for (OrderDetail orderDetail : orderDetails) {
-                    ss.add(orderDetail.getName());
-                }
-                orderVO.setOrderDishes(ss);
+                // 使用 Stream API 一行代码完成拼接
+                String orderDishes = orderDetails.stream()
+                        .map(OrderDetail::getName)
+                        .collect(Collectors.joining(","));
                 // e. 将组装好的 OrderVO 添加到最终的结果列表中
+                orderVO.setOrderDishes(orderDishes);
                 list.add(orderVO);
             }
         }
-        return new PageResult<>(page.getTotal(), list);
+        return new PageResult<>(page != null ? page.getTotal() : 0, list);
     }
 
     @Override
@@ -211,7 +212,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public void delivery(Integer id) {
-        orderMapper.delivery(id);
+        Orders orders = orderMapper.getById(Long.valueOf(id));
+        orderMapper.delivery(id, orders.getEstimatedDeliveryTime());
     }
 
     @SuppressWarnings("null")
