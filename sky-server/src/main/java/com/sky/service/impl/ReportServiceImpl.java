@@ -4,22 +4,21 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.sky.dto.UserStatisticsDTO;
-import com.sky.mapper.UserMapper;
-import com.sky.vo.UserReportVO;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.sky.entity.Orders;
+import com.sky.dto.DailyTurnoverDTO;
+import com.sky.dto.UserStatisticsDTO;
 import com.sky.mapper.OrderMapper;
+import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
 import com.sky.vo.TurnoverReportVO;
+import com.sky.vo.UserReportVO;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,28 +35,33 @@ public class ReportServiceImpl implements ReportService {
     public TurnoverReportVO getTurnoverReport(LocalDate begin, LocalDate end) {
         // 用于存放begin到end之内的日期
         List<LocalDate> dateList = new ArrayList<>();
+        LocalDate beginDate = begin;
+        dateList.add(begin);
         while (begin.isBefore(end)) {
             begin = begin.plusDays(1);
             dateList.add(begin);
         }
-        List<Double> turnoverList = new ArrayList<>();
-        for (LocalDate date : dateList) {
-            LocalDateTime beginTime = LocalDateTime.of(date, LocalTime.MIN);
-            LocalDateTime endTime = LocalDateTime.of(date, LocalTime.MAX);
-
-            Map map = new HashMap();
-            map.put("begin", beginTime);
-            map.put("end", endTime);
-            map.put("status", Orders.COMPLETED);
-            Double turnover = orderMapper.sumBymap(map);
-            turnover = turnover == null ? 0 : turnover;
-            turnoverList.add(turnover);
-        }
         String s = StringUtils.join(dateList, ",");
+        LocalDateTime beginTime = LocalDateTime.of(beginDate, LocalTime.MIN);
+        LocalDateTime endTime = LocalDateTime.of(end, LocalTime.MAX);
+        // 一次性查询每天的营业额
+        List<DailyTurnoverDTO> dailyTurnover = orderMapper.conutgetTime(beginTime, endTime);
+        /**
+         *
+         * Map[天数，营业额]
+         * 
+         * */
+        Map<LocalDate, Double> teDayTurnover = dailyTurnover.stream().
+                collect(Collectors.toMap(DailyTurnoverDTO::getToday, DailyTurnoverDTO::getTurnover));
 
+        List<Double> turnoverList = new ArrayList<>();
+        for (LocalDate data : dateList) {
+            turnoverList.add(teDayTurnover.getOrDefault(data, 0.0));
+        }
+        String TurnoverDate = StringUtils.join(turnoverList, ",");
         return TurnoverReportVO.builder().dateList(s).
-                turnoverList(StringUtils.join(turnoverList, ","))
-                .build();
+                        turnoverList(TurnoverDate)
+                        .build();
     }
 
     @Override

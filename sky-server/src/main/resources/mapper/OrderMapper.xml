@@ -108,4 +108,15 @@
             <if test="status != null">and status = #{status}</if>
         </where>
     </select>
+    <select id="conutgetTime" resultType="com.sky.dto.DailyTurnoverDTO">
+        select 
+            DATE(order_time) as today
+            , sum(amount) as turnover
+        from orders
+        where order_time &gt;= #{beginTime}
+          and order_time &lt;= #{endTime}
+          and status = 5
+        group by DATE(order_time)
+        order by today
+    </select>
 </mapper>

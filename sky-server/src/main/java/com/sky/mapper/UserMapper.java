@@ -21,7 +21,7 @@ public interface UserMapper {
     void insert(User build);
 
     @Select("select * from user where openid = #{openId}")
-    public User getByOpenids(String openId);
+    User getByOpenids(String openId);
 
     List<UserStatisticsDTO> countNewUsersByDateRange(LocalDateTime beginTime, LocalDateTime endTime);
 

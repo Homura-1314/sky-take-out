@@ -4,17 +4,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+import com.sky.dto.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.springframework.data.repository.query.Param;
 
 import com.github.pagehelper.Page;
-import com.sky.dto.OrdersCancelDTO;
-import com.sky.dto.OrdersDTOS;
-import com.sky.dto.OrdersPageQueryDTO;
-import com.sky.dto.OrdersPaymentDTO;
-import com.sky.dto.OrdersRejectionDTO;
 import com.sky.entity.Orders;
 import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderVO;
@@ -81,4 +77,6 @@ public interface OrderMapper {
     Orders getById(Long id);
 
     Double sumBymap(Map map);
+
+    List<DailyTurnoverDTO> conutgetTime(LocalDateTime beginTime, LocalDateTime endTime);
 }
