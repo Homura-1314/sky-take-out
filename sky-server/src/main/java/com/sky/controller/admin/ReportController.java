@@ -2,6 +2,7 @@ package com.sky.controller.admin;
 
 import java.time.LocalDate;
 
+import com.sky.vo.OrderReportVO;
 import com.sky.vo.UserReportVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -44,6 +45,17 @@ public class ReportController {
         log.info("用户数据统计：{}，{}", begin, end);
         UserReportVO userReportVO = reportService.getUserStatistics(begin, end);
         return Result.success(userReportVO);
+    }
+
+    @GetMapping("/ordersStatistics")
+    public Result<OrderReportVO> ordersStatistics(
+            @DateTimeFormat(pattern = "yyyy-MM-dd")
+            LocalDate begin,
+            @DateTimeFormat(pattern = "yyyy-MM-dd")
+            LocalDate end
+    ){
+        log.info("订单数据统计：{}，{}", begin, end);
+        return Result.success(reportService.getOrderStatistcs(begin, end));
     }
 
 }

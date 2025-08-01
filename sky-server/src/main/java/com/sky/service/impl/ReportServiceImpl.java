@@ -6,6 +6,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -13,10 +14,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.sky.dto.DailyTurnoverDTO;
+import com.sky.dto.OrderNumbersDTO;
 import com.sky.dto.UserStatisticsDTO;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
+import com.sky.vo.OrderReportVO;
 import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
 
@@ -33,22 +36,15 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public TurnoverReportVO getTurnoverReport(LocalDate begin, LocalDate end) {
-        // 用于存放begin到end之内的日期
-        List<LocalDate> dateList = new ArrayList<>();
-        LocalDate beginDate = begin;
-        dateList.add(begin);
-        while (begin.isBefore(end)) {
-            begin = begin.plusDays(1);
-            dateList.add(begin);
-        }
+        List<LocalDate> dateList = dateInterval(begin, end);
         String s = StringUtils.join(dateList, ",");
-        LocalDateTime beginTime = LocalDateTime.of(beginDate, LocalTime.MIN);
+        LocalDateTime beginTime = LocalDateTime.of(begin, LocalTime.MIN);
         LocalDateTime endTime = LocalDateTime.of(end, LocalTime.MAX);
         // 一次性查询每天的营业额
         List<DailyTurnoverDTO> dailyTurnover = orderMapper.conutgetTime(beginTime, endTime);
         /**
          *
-         * Map[天数，营业额]
+         * Map[日期，营业额]
          * 
          * */
         Map<LocalDate, Double> teDayTurnover = dailyTurnover.stream().
@@ -67,10 +63,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public UserReportVO getUserStatistics(LocalDate begin, LocalDate end) {
         // 用于存放begin到end之内的日期
-        List<LocalDate> dateList = new ArrayList<>();
-        for (LocalDate date = begin; !date.isAfter(end); date = date.plusDays(1)) {
-            dateList.add(date);
-        }
+        List<LocalDate> dateList = dateInterval(begin, end);
         String dateListStr = StringUtils.join(dateList, ",");
         // 一次性查询每日新增用户数
         LocalDateTime beginTime = LocalDateTime.of(begin, LocalTime.MIN);
@@ -109,4 +102,55 @@ public class ReportServiceImpl implements ReportService {
                 .newUserList(newUserListStr)
                 .build();
     }
+
+    @Override
+    public OrderReportVO getOrderStatistcs(LocalDate begin, LocalDate end) {
+        List<LocalDate> dateList = dateInterval(begin, end);
+        String dateListStr = StringUtils.join(dateList, ",");
+        LocalDateTime beginTime = LocalDateTime.of(begin, LocalTime.MIN);
+        LocalDateTime endTime = LocalDateTime.of(end, LocalTime.MAX);
+        List<OrderNumbersDTO> numbersDTOS = orderMapper.getOrderStatistcs(beginTime, endTime);
+        Map<LocalDate, OrderNumbersDTO> numbersDTOMap = numbersDTOS
+                .stream()
+                .collect(Collectors.toMap(OrderNumbersDTO::getDate, Function.identity()));
+        List<Integer> totalOrderList = new ArrayList<>();
+        List<Integer> validOrderList = new ArrayList<>();
+        Integer totalOrderCount = 0;
+        Integer validOrderCount = 0;
+        Double orderCompletionRate;
+        for (LocalDate date : dateList) {
+            OrderNumbersDTO dto = numbersDTOMap.get(date);
+            if (dto != null) {
+                Integer totalOrdersNumber = dto.getOrderNumber();
+                Integer validOrderNumber = dto.getValidOrderNumber();
+                totalOrderCount += totalOrdersNumber;
+                validOrderCount += validOrderNumber;
+                totalOrderList.add(totalOrdersNumber);
+                validOrderList.add(validOrderNumber);
+            }else {
+                totalOrderList.add(0);
+                validOrderList.add(0);
+            }
+        }
+        String totalOrderListStr = StringUtils.join(totalOrderList, ",");
+        String validOrderListStr = StringUtils.join(validOrderList, ",");
+        orderCompletionRate = totalOrderCount == 0 ? 0.0 : validOrderCount * 1.0 / totalOrderCount;
+        return OrderReportVO.builder()
+                .dateList(dateListStr)
+                .orderCountList(totalOrderListStr)
+                .validOrderCountList(validOrderListStr)
+                .totalOrderCount(totalOrderCount)
+                .validOrderCount(validOrderCount)
+                .orderCompletionRate(orderCompletionRate).build();
+    }
+
+    public List<LocalDate> dateInterval(LocalDate begin, LocalDate end){
+        // 用于存放begin到end之内的日期
+        List<LocalDate> dateList = new ArrayList<>();
+        for (LocalDate date = begin; !date.isAfter(end); date = date.plusDays(1)) {
+            dateList.add(date);
+        }
+        return dateList;
+    }
+
 }

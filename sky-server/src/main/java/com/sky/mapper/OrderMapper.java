@@ -79,4 +79,6 @@ public interface OrderMapper {
     Double sumBymap(Map map);
 
     List<DailyTurnoverDTO> conutgetTime(LocalDateTime beginTime, LocalDateTime endTime);
+
+    List<OrderNumbersDTO> getOrderStatistcs(LocalDateTime beginTime, LocalDateTime endTime);
 }

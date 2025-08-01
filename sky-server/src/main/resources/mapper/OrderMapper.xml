@@ -119,4 +119,14 @@
         group by DATE(order_time)
         order by today
     </select>
+    <select id="getOrderStatistcs" resultType="com.sky.dto.OrderNumbersDTO">
+        select
+        DATE (order_time) as date,
+        count(*) as orderNumber,
+        sum(if(status = 5, 1, 0)) as validOrderNumber
+        from orders
+        where order_time &gt;= #{beginTime} and order_time &lt;= #{endTime}
+        group by DATE(order_time)
+        order by date
+    </select>
 </mapper>
