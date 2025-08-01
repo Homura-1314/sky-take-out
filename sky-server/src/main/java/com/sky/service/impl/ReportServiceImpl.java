@@ -9,6 +9,9 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.sky.dto.GoodsSalesDTO;
+import com.sky.mapper.OrderDetailMapper;
+import com.sky.vo.SalesTop10ReportVO;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,6 +36,8 @@ public class ReportServiceImpl implements ReportService {
     private OrderMapper orderMapper;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private OrderDetailMapper orderDetailMapper;
 
     @Override
     public TurnoverReportVO getTurnoverReport(LocalDate begin, LocalDate end) {
@@ -142,6 +147,22 @@ public class ReportServiceImpl implements ReportService {
                 .totalOrderCount(totalOrderCount)
                 .validOrderCount(validOrderCount)
                 .orderCompletionRate(orderCompletionRate).build();
+    }
+
+    @Override
+    public SalesTop10ReportVO getrdersSalesTop10(LocalDate begin, LocalDate end) {
+        LocalDateTime beginTime = LocalDateTime.of(begin, LocalTime.MIN);
+        LocalDateTime endTime = LocalDateTime.of(end, LocalTime.MAX);
+        List<GoodsSalesDTO> reportDTOList = orderDetailMapper.getcountData(beginTime, endTime);
+        String nameList = reportDTOList.stream().map(GoodsSalesDTO::getName).
+                collect(Collectors.joining(","));
+        String numbersList = StringUtils.join(reportDTOList.
+                stream().map(GoodsSalesDTO::getNumber)
+                .toList(), ",");
+        return SalesTop10ReportVO.builder()
+                .nameList(nameList)
+                .numberList(numbersList)
+                .build();
     }
 
     public List<LocalDate> dateInterval(LocalDate begin, LocalDate end){

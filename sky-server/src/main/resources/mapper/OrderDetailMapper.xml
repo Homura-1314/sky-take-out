@@ -10,6 +10,16 @@
             <foreach collection="orderDetails" item="_" separator=",">
                 (#{_.name}, #{_.image}, #{_.orderId}, #{_.dishId}, #{_.setmealId}, #{_.dishFlavor}, #{_.amount})
             </foreach>
-
     </insert>
+    <select id="getcountData" resultType="com.sky.dto.GoodsSalesDTO">
+        select
+        od.name as name,
+        sum(od.number) as number
+        from orders
+        left join order_detail od on orders.id = od.order_id
+        where status = 5 and order_time &gt;= #{beginTime} and order_time &lt;= #{endTime}
+        group by od.name
+        order by number desc
+        limit 0, 10
+    </select>
 </mapper>
