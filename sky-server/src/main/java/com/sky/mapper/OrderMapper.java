@@ -1,18 +1,23 @@
 package com.sky.mapper;
 
-import com.sky.dto.*;
-import com.sky.vo.OrderVO;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
-
-import com.github.pagehelper.Page;
-import com.sky.entity.Orders;
-import com.sky.vo.OrderStatisticsVO;
 import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import com.github.pagehelper.Page;
+import com.sky.dto.OrdersCancelDTO;
+import com.sky.dto.OrdersDTOS;
+import com.sky.dto.OrdersPageQueryDTO;
+import com.sky.dto.OrdersPaymentDTO;
+import com.sky.dto.OrdersRejectionDTO;
+import com.sky.entity.Orders;
+import com.sky.vo.OrderStatisticsVO;
+import com.sky.vo.OrderVO;
 
 @Mapper
 public interface OrderMapper {
@@ -22,19 +27,19 @@ public interface OrderMapper {
     Page<Orders> page(OrdersPageQueryDTO ordersPageQueryDTO);
 
     OrderStatisticsVO getStatistics();
-    @Update("update orders set status = 6, cancel_reason = #{cancelReason} where id = #{id}")
+    @Update("update orders set status = 6, cancel_reason = #{cancelReason}, cancel_time = now() where id = #{id}")
     void cancel(OrdersCancelDTO ordersCancelDTO);
 
     @Update("update orders set status = #{status} where id = #{id}")
     void complete(Orders orders);
-    @Update("update orders set rejection_reason = #{rejectionReason} where id = #{id}")
+    @Update("update orders set rejection_reason = #{rejectionReason}, status = 6 where id = #{id}")
     void rejection(OrdersRejectionDTO ordersRejectionDTO);
     @Update("update orders set status = #{status} where id = #{id}")
     void confirm(Orders orders);
     @Select("select * from orders where id = #{id}")
     OrderVO selete(Integer id);
-    @Update("update orders set status = 4 where id = #{id}")
-    void delivery(Integer id);
+    @Update("update orders set status = 4, delivery_time = #{estimatedDeliveryTime} where id = #{id}")
+    void delivery(Integer id, LocalDateTime estimatedDeliveryTime);
 
     Page<OrdersDTOS> pageUser(int page, int pageSize, Integer status);
 
@@ -72,4 +77,8 @@ public interface OrderMapper {
      * @param orders
      */
     void update(Orders orders);
+    @Select("select * from orders where id = #{id}")
+    Orders getById(Long id);
+
+    Double sumBymap(Map map);
 }

@@ -1,7 +1,6 @@
 package com.sky.service;
 
 import com.sky.dto.*;
-import com.sky.entity.Orders;
 import com.sky.result.PageResult;
 import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderStatisticsVO;
@@ -14,7 +13,7 @@ public interface OrderService {
 
     void cancel(OrdersCancelDTO ordersCancelDTO);
 
-    PageResult<Orders> page(OrdersPageQueryDTO ordersPageQueryDTO);
+    PageResult<OrderVO> page(OrdersPageQueryDTO ordersPageQueryDTO);
 
     OrderStatisticsVO statistics();
 
@@ -40,4 +39,5 @@ public interface OrderService {
      */
     void paySuccess(String outTradeNo);
 
+    void reminder(Long id);
 }
