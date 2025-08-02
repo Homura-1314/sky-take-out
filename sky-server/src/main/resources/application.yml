@@ -35,9 +35,9 @@ logging:
   level:
     com:
       sky:
-        mapper: error
-        service: error
-        controller: error
+        mapper: debug
+        service: info
+        controller: info
 
 sky:
   jwt:
