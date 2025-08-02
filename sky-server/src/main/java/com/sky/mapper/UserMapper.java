@@ -26,4 +26,6 @@ public interface UserMapper {
     List<UserStatisticsDTO> countNewUsersByDateRange(LocalDateTime beginTime, LocalDateTime endTime);
 
     Integer countTotalUsersBeforeDate(LocalDateTime beginTime);
+
+    Integer countByMap(Map map);
 }

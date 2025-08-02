@@ -74,6 +74,17 @@
         from setmeal s left join category c on s.category_id = c.id
         where s.id = #{id}
     </select>
+    <select id="countByMap" resultType="java.lang.Integer">
+        select count(id) from setmeal
+        <where>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="categoryId != null">
+                and category_id = #{categoryId}
+            </if>
+        </where>
+    </select>
     <!-- update -->
     <update id="update">
             update setmeal

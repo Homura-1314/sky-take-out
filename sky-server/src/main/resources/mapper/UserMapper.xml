@@ -26,4 +26,9 @@
         <select id="countTotalUsersBeforeDate" resultType="java.lang.Integer">
                 select count(id) from user where create_time &lt; #{beginTime}
         </select>
+    <select id="countByMap" resultType="java.lang.Integer">
+            select count(*)
+            from user
+            where create_time &lt; #{bengin}
+    </select>
 </mapper>

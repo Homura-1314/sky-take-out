@@ -1,5 +1,13 @@
 package com.sky.service.impl;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.sky.constant.StatusConstant;
 import com.sky.entity.Orders;
 import com.sky.mapper.DishMapper;
@@ -11,13 +19,8 @@ import com.sky.vo.BusinessDataVO;
 import com.sky.vo.DishOverViewVO;
 import com.sky.vo.OrderOverViewVO;
 import com.sky.vo.SetmealOverViewVO;
+
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.HashMap;
-import java.util.Map;
 
 @Service
 @Slf4j
@@ -38,6 +41,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
      * @param end
      * @return
      */
+    @Override
     public BusinessDataVO getBusinessData(LocalDateTime begin, LocalDateTime end) {
         /**
          * 营业额：当日已完成订单的总金额
@@ -90,6 +94,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
      *
      * @return
      */
+    @Override
     public OrderOverViewVO getOrderOverView() {
         Map map = new HashMap();
         map.put("begin", LocalDateTime.now().with(LocalTime.MIN));
@@ -128,6 +133,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
      *
      * @return
      */
+    @Override
     public DishOverViewVO getDishOverView() {
         Map map = new HashMap();
         map.put("status", StatusConstant.ENABLE);
@@ -147,6 +153,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
      *
      * @return
      */
+    @Override
     public SetmealOverViewVO getSetmealOverView() {
         Map map = new HashMap();
         map.put("status", StatusConstant.ENABLE);

@@ -21,4 +21,10 @@
                         #{id}
                 </foreach>
         </delete>
+    <select id="getByDishIdflwvors" resultType="java.lang.String">
+            select df.name
+                from dish d
+                left join dish_flavor df on d.id = df.dish_id
+                where d.id = #{dishId}
+    </select>
 </mapper>

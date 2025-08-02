@@ -101,15 +101,15 @@ public class OrderServiceImpl implements OrderService {
         }
         Long id = BaseContext.getCurrentId();
         ShoppingCart cart = ShoppingCart.builder()
-                .id(id)
+                .userId(id)
                 .build();
         List<ShoppingCart> carts = shoppingMapper.list(cart);
-        if (carts.isEmpty()) throw new ShoppingCartBusinessException(MessageConstant.SHOPPING_CART_IS_NULL);
+        if (carts == null || carts.isEmpty()) throw new ShoppingCartBusinessException(MessageConstant.SHOPPING_CART_IS_NULL);
         Orders orders = new Orders();
         BeanUtils.copyProperties(ordersSubmitDTO, orders);
         orders.setOrderTime(LocalDateTime.now());
         orders.setPayStatus(Orders.UN_PAID);
-        orders.setStatus(Orders.PENDING_PAYMENT);
+        orders.setStatus(ordersSubmitDTO.getDeliveryStatus());
         orders.setNumber(String.valueOf(System.currentTimeMillis()));
         orders.setPhone(addressBook.getPhone());
         orders.setConsignee(addressBook.getConsignee());
@@ -118,14 +118,13 @@ public class OrderServiceImpl implements OrderService {
         orders.setTablewareStatus(Orders.PENDING_PAYMENT);
         orderMapper.insert(orders);
         // 向订单插入n条数据
-        List<OrderDetail> orderDetails = new ArrayList<>();
-        carts.forEach(item -> {
+        List<OrderDetail> orderDetailList = carts.stream().map(cart_ -> {
             OrderDetail orderDetail = new OrderDetail();
-            BeanUtils.copyProperties(item, orderDetail);
+            BeanUtils.copyProperties(cart_, orderDetail, "id", "userId", "createTime"); // 忽略不需要的属性
             orderDetail.setOrderId(orders.getId());
-            orderDetails.add(orderDetail);
-        });
-        orderDetailMapper.insertBatch(orderDetails);
+            return orderDetail;
+        }).toList();
+        orderDetailMapper.insertBatch(orderDetailList);
         shoppingMapper.cleanShopping(id);
         return OrderSubmitVO.builder()
                 .id(orders.getId())

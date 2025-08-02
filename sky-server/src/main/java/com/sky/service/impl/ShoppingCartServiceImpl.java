@@ -3,6 +3,9 @@ package com.sky.service.impl;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.sky.entity.DishFlavor;
+import com.sky.exception.BaseException;
+import com.sky.mapper.DishFlavorMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,49 +32,62 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     private DishMapper dishMapper;
     @Autowired
     private SetmealMapper setmealMapper;
+
+
     @Override
     @Transactional
     public void addShopping(ShoppingCartDTO shoppingCartDTO) {
-        // 1. 创建一个用于查询的购物车实体
-        ShoppingCart shoppingCart = new ShoppingCart();
-        BeanUtils.copyProperties(shoppingCartDTO, shoppingCart);
+        // 创建一个查询条件的副本，并设置用户ID
+        ShoppingCart queryCart = new ShoppingCart();
+        BeanUtils.copyProperties(shoppingCartDTO, queryCart);
         Long userId = BaseContext.getCurrentId();
-        shoppingCart.setUserId(userId);
+        queryCart.setUserId(userId);
 
-        // 2. 查询购物车中是否已存在该商品
-        List<ShoppingCart> list = shoppingMapper.list(shoppingCart);
+        // 根据完整的条件（包括口味）查询购物车
+        List<ShoppingCart> list = shoppingMapper.list(queryCart);
 
-        // 3. 判断查询结果
+        //  判断是更新还是插入
         if (list != null && !list.isEmpty()) {
-            // 3.1 如果已存在，则更新数量（在数据库查出的对象上+1）
-            ShoppingCart cart = list.get(0);
-            cart.setNumber(cart.getNumber() + 1);
-            shoppingMapper.updateNumber(cart);
+            // 3.1 已存在：直接更新数量
+            ShoppingCart existingCartItem = list.get(0);
+            existingCartItem.setNumber(existingCartItem.getNumber() + 1);
+            shoppingMapper.updateNumber(existingCartItem);
         } else {
-            // 3.2 如果不存在，则插入新记录
-            // 判断是菜品还是套餐，并设置名称、图片、金额
+            // 不存在：创建新的购物车项并插入
+            // 创建一个全新的、干净的实体对象用于插入，避免状态污染
+            ShoppingCart newCartItem = new ShoppingCart();
+            BeanUtils.copyProperties(shoppingCartDTO, newCartItem);
+            newCartItem.setUserId(userId);
+            newCartItem.setNumber(1); // 初始数量为1
+            newCartItem.setCreateTime(LocalDateTime.now());
+
+            // 判断是菜品还是套餐，并填充额外信息
             Long dishId = shoppingCartDTO.getDishId();
             if (dishId != null) {
                 // 是菜品
                 Dish dish = dishMapper.getByid(dishId);
-                shoppingCart.setName(dish.getName());
-                shoppingCart.setImage(dish.getImage());
-                shoppingCart.setAmount(dish.getPrice());
+                if (dish != null) {
+                    newCartItem.setName(dish.getName());
+                    newCartItem.setImage(dish.getImage());
+                    newCartItem.setAmount(dish.getPrice());
+                } else {
+                    throw new BaseException("添加购物车的菜品不存在");
+                }
             } else {
                 // 是套餐
                 Long setmealId = shoppingCartDTO.getSetmealId();
                 Setmeal setmeal = setmealMapper.getBysetmeal(setmealId);
-                shoppingCart.setName(setmeal.getName());
-                shoppingCart.setImage(setmeal.getImage());
-                shoppingCart.setAmount(setmeal.getPrice());
+                if (setmeal != null) {
+                    newCartItem.setName(setmeal.getName());
+                    newCartItem.setImage(setmeal.getImage());
+                    newCartItem.setAmount(setmeal.getPrice());
+                } else {
+                    throw new BaseException("添加购物车的套餐不存在");
+                }
             }
 
-            // 设置初始数量为1和创建时间
-            shoppingCart.setNumber(1);
-            shoppingCart.setCreateTime(LocalDateTime.now());
-
             // 插入到数据库
-            shoppingMapper.insert(shoppingCart);
+            shoppingMapper.insert(newCartItem);
         }
     }
 
