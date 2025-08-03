@@ -7,6 +7,8 @@ import com.sky.vo.SalesTop10ReportVO;
 import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
 
+import javax.servlet.http.HttpServletResponse;
+
 public interface ReportService {
 
     TurnoverReportVO getTurnoverReport(LocalDate begin, LocalDate end);
@@ -16,4 +18,6 @@ public interface ReportService {
     OrderReportVO getOrderStatistcs(LocalDate begin, LocalDate end);
 
     SalesTop10ReportVO getrdersSalesTop10(LocalDate begin, LocalDate end);
+
+    void exportBusinessData(HttpServletResponse response);
 }

@@ -2,6 +2,7 @@ package com.sky.controller.admin;
 
 import java.time.LocalDate;
 
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +17,8 @@ import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
 
 import lombok.extern.slf4j.Slf4j;
+
+import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping("/admin/report")
@@ -67,5 +70,10 @@ public class ReportController {
         log.info("top数据统计：{}，{}", begin, end);
         return Result.success(reportService.getrdersSalesTop10(begin, end));
     }
-    
+
+    @GetMapping("/export")
+    public void export(HttpServletResponse response){
+        reportService.exportBusinessData(response);
+    }
+
 }
